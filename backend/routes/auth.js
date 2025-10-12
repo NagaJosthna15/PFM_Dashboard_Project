@@ -4,9 +4,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import User from '../models/User.js';
 import { blacklistToken } from '../middlewares/tokenBlacklist.js';
-import dotenv from 'dotenv';
-
-dotenv.config({override: true, quiet: true});
+import { redisClient } from '../config/redis.js';
 
 const router = express.Router();
 
@@ -21,7 +19,7 @@ const generateToken = (userId) => {
       aud: 'pfm-client',
     },
     process.env.JWT_SECRET,
-    { expiresIn: '10m' }
+    { expiresIn: '15m' }
   );
 };
 
@@ -34,13 +32,11 @@ router.post('/register', async (req, res) => {
     }
 
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
-    if (existingUser) {
-      if (existingUser.username === username) {
-        return res.status(400).json({ error: 'Username already exists' });
-      }
-      if (existingUser.email === email) {
-        return res.status(400).json({ error: 'Email has already exists' });
-      }
+    if (existingUser.username==username) {
+      return res.status(400).json({ error: 'Username already exists'});
+    }
+    if (existingUser.email==email) {
+      return res.status(400).json({ error: 'User with the entered email already exists'});
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -52,12 +48,12 @@ router.post('/register', async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', 
       sameSite: process.env.NODE_ENV === 'production' ? "none" : "lax", 
-      maxAge: 10 * 60 * 1000, 
+      maxAge: 15 * 60 * 1000, 
     });
     res.status(201).json({
       message: 'User registered successfully',
-      user: { id: user._id, username: user.username, email: user.email, profilePicture: user.profilePicture },
-
+      token,
+      user: { id: user._id, username: user.username, email: user.email },
     });
   } catch (error) {
     console.error('Error during registration:', error);
@@ -93,12 +89,13 @@ router.post('/login', async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', 
       sameSite: process.env.NODE_ENV === 'production' ? "none" : "lax", 
-      maxAge: 10 * 60 * 1000, 
+      maxAge: 15 * 60 * 1000, 
     });
 
     res.json({
       message: 'Login successful',
-      user: { id: user._id, username: user.username, email: user.email, profilePicture: user.profilePicture },
+      token,
+      user: { id: user._id, username: user.username, email: user.email },
     });
   } catch (error) {
     console.error('Error during login:', error);

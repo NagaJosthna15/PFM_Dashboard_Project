@@ -1,12 +1,9 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
 import Navbar from '../components/Navbar';
 
 const Profile = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: user?.username || '',
     email: user?.email || '',
@@ -33,27 +30,19 @@ const Profile = () => {
         if (response.ok) {
           const data = await response.json();
           setFormData({ ...formData, profilePicture: `http://localhost:5000${data.profilePicture}` });
-          toast.success('Profile picture updated successfully!');
+          alert('Profile picture updated successfully!');
         } else {
           const error = await response.json();
-          toast.error(error.error || 'Failed to upload profile picture');
+          alert(error.error || 'Failed to upload profile picture');
         }
       } catch (error) {
-        toast.error('Error uploading profile picture');
+        alert('Error uploading profile picture');
       }
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Check if there are any changes
-    const hasChanges = formData.username !== user?.username || formData.email !== user?.email;
-    
-    if (!hasChanges) {
-      return; // Don't make API call or show toast if no changes
-    }
-    
     try {
       const response = await fetch('http://localhost:5000/api/users/profile', {
         method: 'PUT',
@@ -70,13 +59,13 @@ const Profile = () => {
       if (response.ok) {
         const data = await response.json();
         // Update user context if needed
-        toast.success('Profile updated successfully!');
+        alert('Profile updated successfully!');
       } else {
         const error = await response.json();
-        toast.error(error.error || 'Failed to update profile');
+        alert(error.error || 'Failed to update profile');
       }
     } catch (error) {
-      toast.error('Error updating profile');
+      alert('Error updating profile');
     }
   };
 
@@ -86,21 +75,11 @@ const Profile = () => {
       
       <main className="max-w-2xl mx-auto py-6 px-4">
         <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center mb-6">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="mr-4 p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <h2 className="text-2xl font-bold text-gray-900">Profile Settings</h2>
-          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Profile Settings</h2>
           
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="sm:flex sm:items-center space-x-6">
-              <div className="w-24 h-24 rounded-full bg-gray-300 display-block m-auto overflow-hidden">
+            <div className="flex items-center space-x-6">
+              <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
                 {user?.profilePicture ? (
                   <img src={`http://localhost:5000${user.profilePicture}`} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
@@ -109,7 +88,7 @@ const Profile = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                     
+                  Profile Picture 
                 </label>
                 <input
                   type="file"

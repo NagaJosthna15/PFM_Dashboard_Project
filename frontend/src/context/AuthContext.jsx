@@ -1,99 +1,61 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import api from '../utils/api';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 import toast from 'react-hot-toast';
 
 const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within an AuthProvider');
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
   return context;
 };
 
+axios.defaults.withCredentials = true; // send cookies automatically
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
 
-  const handleLogout = useCallback(async () => {
-    if (!isAuthenticated) return;
-    try {
-      api.post('/api/auth/logout');
-    } catch (err) {
-      console.warn('Logout API call failed', err);
-    } finally {
-      setIsAuthenticated(false);
-      setUser(null);
-      toast.success('Logged out successfully');
-    }
-  }, [isAuthenticated]);
-
+  // Axios interceptor to handle 401/403 responses
   useEffect(() => {
-    const responseInterceptor = api.interceptors.response.use(
+    const interceptor = axios.interceptors.response.use(
       (res) => res,
       (err) => {
-        const originalUrl = err.config?.url;
-        const status = err.response?.status;
-
-        if (
-          (status === 401 || status === 403) &&
-          !originalUrl?.includes('/api/users/profile') &&
-          isAuthenticated
-        ) {
+        if (err.response?.status === 401 || err.response?.status === 403) {
           handleLogout();
         }
         return Promise.reject(err);
       }
     );
-    return () => api.interceptors.response.eject(responseInterceptor);
-  }, [handleLogout, isAuthenticated]);
+    return () => axios.interceptors.response.eject(interceptor);
+  }, []);
 
+  // Fetch current user info on mount
   useEffect(() => {
-   
-    let isCancelled = false;
-
-    const checkAuth = async () => {
+    const fetchUser = async () => {
       try {
-        const response = await api.get('/api/users/profile');
-        if (isCancelled) return;
-
-        const userData = {
-          id: response.data.user?.id ?? response.data.user?._id,
-          username: response.data.user?.username,
-          email: response.data.user?.email,
-          profilePicture: response.data.user?.profilePicture
-        };
-        setUser(userData);
-        setIsAuthenticated(true);
-      } catch (err) {
-        if (isCancelled) return;
+        const response = await axios.get('http://localhost:5000/api/users/profile', { withCredentials: true });
+        setUser(response.data.user);
+      } catch {
         setUser(null);
-        setIsAuthenticated(false);
       } finally {
-        if (!isCancelled) setInitialLoading(false);
+        setInitialLoading(false);
       }
     };
-
-    checkAuth();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, []); 
+    fetchUser();
+  }, []);
 
   const login = async (credentials) => {
     setLoading(true);
     try {
-      const response = await api.post('/api/auth/login', credentials);
-      const userData = {
-        id: response.data.user?.id ?? response.data.user?._id,
-        username: response.data.user?.username,
-        email: response.data.user?.email,
-        profilePicture: response.data.user?.profilePicture
-      };
-      setUser(userData);
-      setIsAuthenticated(true);
+      const response = await axios.post(
+        'http://localhost:5000/api/auth/login',
+        credentials
+      );
+      setUser(response.data.user); // backend sets HttpOnly cookie
       toast.success('Login successful!');
       return { success: true };
     } catch (error) {
@@ -108,16 +70,11 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     setLoading(true);
     try {
-      const response = await api.post('/api/auth/register', userData);
-      const userDetails = {
-        id: response.data.user?.id ?? response.data.user?._id,
-        username: response.data.user?.username,
-        email: response.data.user?.email,
-        profilePicture: response.data.user?.profilePicture
-
-      };
-      setUser(userDetails);
-      setIsAuthenticated(true);
+      const response = await axios.post(
+        'http://localhost:5000/api/auth/register',
+        userData
+      );
+      setUser(response.data.user); // backend sets HttpOnly cookie
       toast.success('Registration successful!');
       return { success: true };
     } catch (error) {
@@ -129,9 +86,19 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await axios.post('http://localhost:5000/api/auth/logout'); // blacklist & clear cookie
+    } catch (err) {
+      console.warn('Logout API failed', err);
+    } finally {
+      setUser(null);
+      toast.success('Logged out successfully');
+    }
+  };
+
   const value = {
     user,
-    isAuthenticated,
     loading,
     initialLoading,
     login,

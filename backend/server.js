@@ -2,43 +2,35 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import connectDB from './config/database.js';
 import { connectRedis } from './config/redis.js';
-import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
-import plaidRoutes from './routes/plaidRoutes.js';
-import dashboardRoutes from './routes/dashboardRoutes.js';
-import budgetRoutes from './routes/budgetRoutes.js';
-import transactionRoutes from './routes/transactionRoutes.js';
+import cookieParser from 'cookie-parser';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const __dirname = import.meta.dirname
-
-dotenv.config({override: true, quiet: true});
-console.log("Frontend URL: ", process.env.FRONTEND_URL)
+dotenv.config({override: true});
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
 // Connect to databases
 connectDB();
 connectRedis();
 
-
-
-app.use(
-  cors({
-    credentials: true,
-    origin: process.env.FRONTEND_URL,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+// Middleware
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true,
+  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization']
+}));
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
 
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -46,10 +38,6 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use("/", plaidRoutes);
-app.use("/", dashboardRoutes);
-app.use("/", budgetRoutes);
-app.use("/", transactionRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
