@@ -7,7 +7,7 @@ import Profile from './pages/Profile';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 function ProtectedRoute({ children }) {
-  const { user, initialLoading } = useAuth();
+  const { token, initialLoading } = useAuth();
   
   if (initialLoading) {
     return (
@@ -17,7 +17,7 @@ function ProtectedRoute({ children }) {
     );
   }
   
-  return user ? children : <Navigate to="/login" />;
+  return token ? children : <Navigate to="/login" />;
 }
 
 function App() {

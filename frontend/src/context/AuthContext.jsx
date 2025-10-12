@@ -16,6 +16,7 @@ axios.defaults.withCredentials = true; // send cookies automatically
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
 
@@ -33,19 +34,21 @@ export const AuthProvider = ({ children }) => {
     return () => axios.interceptors.response.eject(interceptor);
   }, []);
 
-  // Fetch current user info on mount
+  // Check for existing token on mount
   useEffect(() => {
-    const fetchUser = async () => {
+    const checkAuth = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/users/profile', { withCredentials: true });
         setUser(response.data.user);
+        setToken('authenticated'); // Set token flag if request succeeds
       } catch {
         setUser(null);
+        setToken(null);
       } finally {
         setInitialLoading(false);
       }
     };
-    fetchUser();
+    checkAuth();
   }, []);
 
   const login = async (credentials) => {
@@ -55,7 +58,8 @@ export const AuthProvider = ({ children }) => {
         'http://localhost:5000/api/auth/login',
         credentials
       );
-      setUser(response.data.user); // backend sets HttpOnly cookie
+      setUser(response.data.user); 
+      setToken(response.data.token);
       toast.success('Login successful!');
       return { success: true };
     } catch (error) {
@@ -74,7 +78,8 @@ export const AuthProvider = ({ children }) => {
         'http://localhost:5000/api/auth/register',
         userData
       );
-      setUser(response.data.user); // backend sets HttpOnly cookie
+      setUser(response.data.user); 
+      setToken(response.data.token);
       toast.success('Registration successful!');
       return { success: true };
     } catch (error) {
@@ -92,6 +97,7 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.warn('Logout API failed', err);
     } finally {
+      setToken(null);
       setUser(null);
       toast.success('Logged out successfully');
     }
@@ -99,6 +105,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    token,
     loading,
     initialLoading,
     login,
