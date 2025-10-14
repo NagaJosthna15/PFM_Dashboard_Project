@@ -3,6 +3,10 @@ import Navbar from '../components/Navbar';
 import PlaidLink from '../components/PlaidLink';
 import AccountsList from '../components/AccountsList';
 import TransactionsList from '../components/TransactionsList';
+import SpendingChart from '../components/SpendingChart';
+import MonthlyChart from '../components/MonthlyChart';
+import BudgetManager from '../components/BudgetManager';
+import IncomeExpenseSummary from '../components/IncomeExpenseSummary';
 
 const Dashboard = () => {
   const [refreshKey, setRefreshKey] = useState(0);
@@ -32,10 +36,26 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Main Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Summary Cards */}
+          <div className="mb-6">
+            <IncomeExpenseSummary refresh={refreshKey} />
+          </div>
+
+          {/* Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <SpendingChart refresh={refreshKey} />
+            <MonthlyChart refresh={refreshKey} />
+          </div>
+
+          {/* Accounts and Transactions */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <AccountsList refresh={refreshKey} />
             <TransactionsList refresh={refreshKey} />
+          </div>
+
+          {/* Budget Management */}
+          <div className="mb-6">
+            <BudgetManager refresh={refreshKey} />
           </div>
         </div>
       </main>

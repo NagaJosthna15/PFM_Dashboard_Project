@@ -8,11 +8,17 @@ Personal Finance Management Dashboard built with React and Node.js.
 - Profile management with photo upload
 - Dashboard interface
 - JWT-based authentication with HttpOnly cookies
-- **Bank Account Integration**
+- **Bank Account Integration (Week 2)**
   - Plaid Link integration for secure bank connections
   - Real-time account balances display
   - Transaction history viewing
   - Secure access token storage
+- **Dashboard and Visualizations (Week 3)**
+  - Automatic transaction categorization
+  - Interactive spending breakdown pie charts
+  - Monthly income vs expense bar charts
+  - Budget management with category limits
+  - Financial summary cards
 
 ## Tech Stack
 
@@ -23,6 +29,7 @@ Personal Finance Management Dashboard built with React and Node.js.
 - Axios
 - React Hot Toast
 - React Plaid Link
+- Recharts
 
 **Backend:**
 - Node.js
@@ -120,6 +127,23 @@ The application will be available at:
 - `GET /api/transactions` - Fetch recent transactions
 - `POST /api/sandbox/create_public_token` - Generate test token (sandbox only)
 
+## Week 3 - Dashboard and Visualizations
+
+### New Features
+- **Transaction Categorization**: Automatic categorization based on merchant names and Plaid categories
+- **Spending Analytics**: Interactive pie charts showing spending breakdown by category
+- **Monthly Trends**: Bar charts displaying income vs expenses over 6 months
+- **Budget Management**: Set and track monthly spending limits by category
+- **Financial Summary**: Overview cards showing income, expenses, and net for current month
+
+### API Endpoints (Week 3)
+- `GET /api/dashboard/spending-by-category` - Get spending breakdown by category
+- `GET /api/dashboard/income-vs-expense` - Get monthly income vs expense summary
+- `GET /api/dashboard/monthly-summary` - Get 6-month financial summary
+- `GET /api/budgets` - Get current month budgets
+- `POST /api/budgets` - Create or update budget
+- `DELETE /api/budgets/:id` - Delete budget
+
 ## Project Structure
 
 ```
@@ -130,7 +154,11 @@ pfm-dashboard/
 │   ├── models/
 │   │   └── PlaidItem.js          # Plaid token storage
 │   ├── routes/
-│   │   └── plaidRoutes.js        # Plaid API endpoints
+│   │   ├── plaidRoutes.js        # Plaid API endpoints
+│   │   ├── dashboardRoutes.js    # Analytics endpoints
+│   │   └── budgetRoutes.js       # Budget management endpoints
+│   ├── utils/
+│   │   └── categorizer.js        # Transaction categorization logic
 │   ├── uploads/
 │   └── server.js
 ├── frontend/
@@ -138,7 +166,11 @@ pfm-dashboard/
 │   │   ├── components/
 │   │   │   ├── PlaidLink.jsx     # Bank connection component
 │   │   │   ├── AccountsList.jsx  # Display accounts
-│   │   │   └── TransactionsList.jsx # Display transactions
+│   │   │   ├── TransactionsList.jsx # Display transactions
+│   │   │   ├── SpendingChart.jsx # Pie chart for spending categories
+│   │   │   ├── MonthlyChart.jsx  # Bar chart for monthly summaries
+│   │   │   ├── BudgetManager.jsx # Budget CRUD operations
+│   │   │   └── IncomeExpenseSummary.jsx # Financial summary cards
 │   │   ├── context/
 │   │   ├── pages/
 │   │   │   └── Dashboard.jsx     # Updated with Plaid integration

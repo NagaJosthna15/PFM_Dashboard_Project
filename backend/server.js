@@ -8,6 +8,8 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
 import plaidRoutes from './routes/plaidRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js';
+import budgetRoutes from './routes/budgetRoutes.js';
 
 const __dirname = import.meta.dirname
 
@@ -38,6 +40,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use("/", plaidRoutes);
+app.use("/", dashboardRoutes);
+app.use("/", budgetRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
