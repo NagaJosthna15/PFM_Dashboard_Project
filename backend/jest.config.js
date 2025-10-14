@@ -1,7 +1,7 @@
 export default {
   testEnvironment: "node",
-  transform: {}, 
+  transform: {}, // Disable Babel transforms since Node supports ESM
   moduleNameMapper: {
-    "^(\\.{1,2}/.*)\\.js$": "$1",
+    "^(\\.{1,2}/.*)\\.js$": "$1", // correct key name
   },
 };
