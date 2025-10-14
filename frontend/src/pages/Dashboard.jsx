@@ -7,6 +7,7 @@ import SpendingChart from '../components/SpendingChart';
 import MonthlyChart from '../components/MonthlyChart';
 import BudgetManager from '../components/BudgetManager';
 import IncomeExpenseSummary from '../components/IncomeExpenseSummary';
+import TransactionManager from '../components/TransactionManager';
 
 const Dashboard = () => {
   const [refreshKey, setRefreshKey] = useState(0);
@@ -23,39 +24,51 @@ const Dashboard = () => {
         <div className="px-4 py-6 sm:px-0">
           {/* Header */}
           <div className="mb-8">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
                   Personal Finance Dashboard
                 </h1>
-                <p className="text-gray-600 mt-2">
-                  Connect your bank accounts to get started
+                <p className="text-gray-600 mt-1">
+                  Track your finances and manage your budget
                 </p>
               </div>
-              <PlaidLink onSuccess={handlePlaidSuccess} />
+              <div className="flex-shrink-0">
+                <PlaidLink onSuccess={handlePlaidSuccess} />
+              </div>
             </div>
           </div>
 
           {/* Summary Cards */}
-          <div className="mb-6">
+          <div className="mb-8">
             <IncomeExpenseSummary refresh={refreshKey} />
           </div>
 
-          {/* Charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <SpendingChart refresh={refreshKey} />
-            <MonthlyChart refresh={refreshKey} />
+          {/* Charts Section */}
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Analytics</h2>
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              <SpendingChart refresh={refreshKey} />
+              <MonthlyChart refresh={refreshKey} />
+            </div>
           </div>
 
-          {/* Accounts and Transactions */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <AccountsList refresh={refreshKey} />
-            <TransactionsList refresh={refreshKey} />
+          {/* Accounts and Transactions Section */}
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Accounts & Transactions</h2>
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              <AccountsList refresh={refreshKey} />
+              <TransactionsList refresh={refreshKey} />
+            </div>
           </div>
 
-          {/* Budget Management */}
-          <div className="mb-6">
-            <BudgetManager refresh={refreshKey} />
+          {/* Management Section */}
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Manage</h2>
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              <BudgetManager refresh={refreshKey} />
+              <TransactionManager refresh={refreshKey} onUpdate={handlePlaidSuccess} />
+            </div>
           </div>
         </div>
       </main>

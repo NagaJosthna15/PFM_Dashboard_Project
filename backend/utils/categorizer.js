@@ -1,10 +1,10 @@
 // Transaction categorization logic
 const categoryMappings = {
   'Food and Drink': ['restaurant', 'cafe', 'starbucks', 'mcdonalds', 'pizza', 'food', 'grocery', 'supermarket'],
-  'Transportation': ['uber', 'lyft', 'gas', 'fuel', 'parking', 'metro', 'bus', 'taxi'],
-  'Shopping': ['amazon', 'target', 'walmart', 'mall', 'store', 'shop'],
-  'Entertainment': ['netflix', 'spotify', 'movie', 'theater', 'game', 'entertainment'],
-  'Bills & Utilities': ['electric', 'water', 'internet', 'phone', 'utility', 'bill'],
+  'Transportation': ['uber', 'lyft', 'gas', 'fuel', 'parking', 'metro', 'bus', 'taxi', 'United Airlines'],
+  'Shopping': ['amazon', 'target', 'walmart', 'mall', 'store', 'shop', 'sparkfun'],
+  'Entertainment': ['netflix', 'spotify', 'movie', 'theater', 'game', 'entertainment', 'climbing', 'playing'],
+  'Bills & Utilities': ['electric', 'water', 'internet', 'phone', 'utility', 'bill','credit'],
   'Healthcare': ['pharmacy', 'doctor', 'hospital', 'medical', 'health'],
   'Income': ['salary', 'payroll', 'deposit', 'transfer'],
   'Other': []

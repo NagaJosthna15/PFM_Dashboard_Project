@@ -10,6 +10,7 @@ import userRoutes from './routes/users.js';
 import plaidRoutes from './routes/plaidRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import budgetRoutes from './routes/budgetRoutes.js';
+import transactionRoutes from './routes/transactionRoutes.js';
 
 const __dirname = import.meta.dirname
 
@@ -42,6 +43,7 @@ app.use('/api/users', userRoutes);
 app.use("/", plaidRoutes);
 app.use("/", dashboardRoutes);
 app.use("/", budgetRoutes);
+app.use("/", transactionRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

@@ -19,6 +19,12 @@ Personal Finance Management Dashboard built with React and Node.js.
   - Monthly income vs expense bar charts
   - Budget management with category limits
   - Financial summary cards
+- **Manual Transaction Management (Week 4)**
+  - Add, edit, and delete transactions manually
+  - Transaction categorization and date management
+  - Enhanced UI/UX with improved styling
+  - Unit and integration testing
+  - Comprehensive project documentation
 
 ## Tech Stack
 
@@ -144,6 +150,29 @@ The application will be available at:
 - `POST /api/budgets` - Create or update budget
 - `DELETE /api/budgets/:id` - Delete budget
 
+## Week 4 - Manual Transactions & Testing
+
+### New Features
+- **Manual Transaction Management**: Add, edit, and delete transactions with custom categories
+- **Enhanced UI/UX**: Improved styling with gradients, icons, and better responsive design
+- **Testing Suite**: Unit tests for categorization logic and integration tests for API endpoints
+- **Project Documentation**: Comprehensive documentation of architecture, features, and deployment
+
+### API Endpoints (Week 4)
+- `GET /api/user-transactions` - Get user's manual transactions
+- `POST /api/user-transactions` - Create manual transaction
+- `PUT /api/user-transactions/:id` - Update transaction
+- `DELETE /api/user-transactions/:id` - Delete transaction
+
+### Testing
+```bash
+# Run backend tests
+cd backend
+npm test
+
+# Test categories: Unit tests, Integration tests
+```
+
 ## Project Structure
 
 ```
@@ -156,7 +185,11 @@ pfm-dashboard/
 │   ├── routes/
 │   │   ├── plaidRoutes.js        # Plaid API endpoints
 │   │   ├── dashboardRoutes.js    # Analytics endpoints
-│   │   └── budgetRoutes.js       # Budget management endpoints
+│   │   ├── budgetRoutes.js       # Budget management endpoints
+│   │   └── transactionRoutes.js  # Manual transaction endpoints
+│   ├── tests/
+│   │   ├── categorizer.test.js   # Unit tests for categorization
+│   │   └── auth.test.js          # Integration tests for auth
 │   ├── utils/
 │   │   └── categorizer.js        # Transaction categorization logic
 │   ├── uploads/
@@ -170,6 +203,7 @@ pfm-dashboard/
 │   │   │   ├── SpendingChart.jsx # Pie chart for spending categories
 │   │   │   ├── MonthlyChart.jsx  # Bar chart for monthly summaries
 │   │   │   ├── BudgetManager.jsx # Budget CRUD operations
+│   │   │   ├── TransactionManager.jsx # Manual transaction CRUD
 │   │   │   └── IncomeExpenseSummary.jsx # Financial summary cards
 │   │   ├── context/
 │   │   ├── pages/
