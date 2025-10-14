@@ -1,14 +1,8 @@
-<<<<<<< HEAD
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
 import PlaidLink from '../components/PlaidLink';
 import AccountsList from '../components/AccountsList';
 import TransactionsList from '../components/TransactionsList';
-import SpendingChart from '../components/SpendingChart';
-import MonthlyChart from '../components/MonthlyChart';
-import BudgetManager from '../components/BudgetManager';
-import IncomeExpenseSummary from '../components/IncomeExpenseSummary';
-import TransactionManager from '../components/TransactionManager';
 
 const Dashboard = () => {
   const [refreshKey, setRefreshKey] = useState(0);
@@ -25,71 +19,23 @@ const Dashboard = () => {
         <div className="px-4 py-6 sm:px-0">
           {/* Header */}
           <div className="mb-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                <h1 className="text-3xl font-bold text-gray-900">
                   Personal Finance Dashboard
                 </h1>
-                <p className="text-gray-600 mt-1">
-                  Track your finances and manage your budget
+                <p className="text-gray-600 mt-2">
+                  Connect your bank accounts to get started
                 </p>
               </div>
-              <div className="flex-shrink-0">
-                <PlaidLink onSuccess={handlePlaidSuccess} />
-              </div>
+              <PlaidLink onSuccess={handlePlaidSuccess} />
             </div>
           </div>
 
-          {/* Summary Cards */}
-          <div className="mb-8">
-            <IncomeExpenseSummary refresh={refreshKey} />
-          </div>
-
-          {/* Charts Section */}
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Analytics</h2>
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-              <SpendingChart refresh={refreshKey} />
-              <MonthlyChart refresh={refreshKey} />
-            </div>
-          </div>
-
-          {/* Accounts and Transactions Section */}
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Accounts & Transactions</h2>
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-              <AccountsList refresh={refreshKey} />
-              <TransactionsList refresh={refreshKey} />
-            </div>
-          </div>
-
-          {/* Management Section */}
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Manage</h2>
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-              <BudgetManager refresh={refreshKey} />
-              <TransactionManager refresh={refreshKey} onUpdate={handlePlaidSuccess} />
-=======
-import Navbar from '../components/Navbar';
-
-const Dashboard = () => {
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-
-      
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 flex items-center justify-center">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Welcome to your Personal Finance Dashboard
-              </h2>
-              <p className="text-gray-600">
-                Phase 1 Complete! Ready for Plaid integration in Week 2.
-              </p>
->>>>>>> 65fafde (Initial commit with .gitignore)
-            </div>
+          {/* Main Content */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <AccountsList refresh={refreshKey} />
+            <TransactionsList refresh={refreshKey} />
           </div>
         </div>
       </main>

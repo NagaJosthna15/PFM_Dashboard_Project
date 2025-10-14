@@ -2,17 +2,16 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import connectDB from './config/database.js';
 import { connectRedis } from './config/redis.js';
+import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
-import cookieParser from 'cookie-parser';
+import plaidRoutes from './routes/plaidRoutes.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = import.meta.dirname
 
-dotenv.config({override: true});
+dotenv.config({override: true, quiet: true});
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -38,6 +37,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use("/", plaidRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

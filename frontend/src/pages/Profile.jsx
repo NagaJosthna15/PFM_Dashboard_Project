@@ -78,8 +78,8 @@ const Profile = () => {
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Profile Settings</h2>
           
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex items-center space-x-6">
-              <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+            <div className="sm:flex sm:items-center space-x-6">
+              <div className="w-24 h-24 rounded-full bg-gray-300 display-block m-auto overflow-hidden">
                 {user?.profilePicture ? (
                   <img src={`http://localhost:5000${user.profilePicture}`} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
@@ -88,7 +88,7 @@ const Profile = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Profile Picture 
+                     
                 </label>
                 <input
                   type="file"

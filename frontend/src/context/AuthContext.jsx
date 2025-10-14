@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import toast from 'react-hot-toast';
 
 const AuthContext = createContext();
@@ -12,7 +12,7 @@ export const useAuth = () => {
   return context;
 };
 
-axios.defaults.withCredentials = true; // send cookies automatically
+
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
 
   // Axios interceptor to handle 401/403 responses
   useEffect(() => {
-    const interceptor = axios.interceptors.response.use(
+    const interceptor = api.interceptors.response.use(
       (res) => res,
       (err) => {
         if (err.response?.status === 401 || err.response?.status === 403) {
@@ -31,14 +31,14 @@ export const AuthProvider = ({ children }) => {
         return Promise.reject(err);
       }
     );
-    return () => axios.interceptors.response.eject(interceptor);
+    return () => api.interceptors.response.eject(interceptor);
   }, []);
 
   // Check for existing token on mount
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/users/profile', { withCredentials: true });
+        const response = await api.get('/api/users/profile');
         setUser(response.data.user);
         setToken('authenticated'); // Set token flag if request succeeds
       } catch {
@@ -54,10 +54,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     setLoading(true);
     try {
-      const response = await axios.post(
-        'http://localhost:5000/api/auth/login',
-        credentials
-      );
+      const response = await api.post('/api/auth/login', credentials);
       setUser(response.data.user); 
       setToken(response.data.token);
       toast.success('Login successful!');
@@ -74,10 +71,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     setLoading(true);
     try {
-      const response = await axios.post(
-        'http://localhost:5000/api/auth/register',
-        userData
-      );
+      const response = await api.post('/api/auth/register', userData);
       setUser(response.data.user); 
       setToken(response.data.token);
       toast.success('Registration successful!');
@@ -93,7 +87,7 @@ export const AuthProvider = ({ children }) => {
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:5000/api/auth/logout'); // blacklist & clear cookie
+      await api.post('/api/auth/logout'); // blacklist & clear cookie
     } catch (err) {
       console.warn('Logout API failed', err);
     } finally {

@@ -1,5 +1,5 @@
 import { usePlaidLink } from 'react-plaid-link';
-import { useState, useEffect, memo } from 'react';
+import { useState } from 'react';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
 
@@ -42,18 +42,10 @@ const PlaidLink = ({ onSuccess }) => {
     },
   });
 
-  useEffect(() => {
-    if (linkToken && ready) {
-      // Link is ready to use
-    }
-  }, [linkToken, ready]);
-
-  const handleConnect = async () => {
+  const handleConnect = () => {
     if (!linkToken) {
-      await createLinkToken();
-      return;
-    }
-    if (ready) {
+      createLinkToken();
+    } else if (ready) {
       open();
     }
   };
@@ -62,18 +54,11 @@ const PlaidLink = ({ onSuccess }) => {
     <button
       onClick={handleConnect}
       disabled={loading || (linkToken && !ready)}
-      className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium py-2.5 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg disabled:cursor-not-allowed"
+      className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-4 rounded-lg transition-colors"
     >
-      {loading ? (
-        <div className="flex items-center">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-          Loading...
-        </div>
-      ) : (
-        'Connect Bank Account'
-      )}
+      {loading ? 'Loading...' : 'Connect Bank Account'}
     </button>
   );
 };
 
-export default memo(PlaidLink);
+export default PlaidLink;

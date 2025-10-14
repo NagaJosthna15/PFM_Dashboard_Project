@@ -19,7 +19,7 @@ const generateToken = (userId) => {
       aud: 'pfm-client',
     },
     process.env.JWT_SECRET,
-    { expiresIn: '15m' }
+    { expiresIn: '10m' }
   );
 };
 
@@ -50,7 +50,7 @@ router.post('/register', async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', 
       sameSite: process.env.NODE_ENV === 'production' ? "none" : "lax", 
-      maxAge: 15 * 60 * 1000, 
+      maxAge: 10 * 60 * 1000, 
     });
     res.status(201).json({
       message: 'User registered successfully',
@@ -91,7 +91,7 @@ router.post('/login', async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', 
       sameSite: process.env.NODE_ENV === 'production' ? "none" : "lax", 
-      maxAge: 15 * 60 * 1000, 
+      maxAge: 10 * 60 * 1000, 
     });
 
     res.json({
