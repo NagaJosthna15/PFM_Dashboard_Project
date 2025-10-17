@@ -6,8 +6,9 @@ import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
+// ✅ Only render children if user is authenticated
 function ProtectedRoute({ children }) {
-  const { token, initialLoading } = useAuth();
+  const { isAuthenticated, initialLoading } = useAuth();
   
   if (initialLoading) {
     return (
@@ -17,7 +18,22 @@ function ProtectedRoute({ children }) {
     );
   }
   
-  return token ? children : <Navigate to="/login" />;
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+}
+
+// ✅ Redirect logged-in users away from login/register
+function PublicRoute({ children }) {
+  const { isAuthenticated, initialLoading } = useAuth();
+  
+  if (initialLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    );
+  }
+  
+  return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
 }
 
 function App() {
@@ -25,21 +41,46 @@ function App() {
     <AuthProvider>
       <Router>
         <div className="min-h-screen bg-gray-50">
-          <Toaster position="top-right" />
+          <Toaster position="top-center" />
           <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            } />
-            <Route path="/" element={<Navigate to="/dashboard" />} />
+            {/* Public routes */}
+            <Route
+              path="/login"
+              element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                <PublicRoute>
+                  <Register />
+                </PublicRoute>
+              }
+            />
+
+            {/* Protected routes */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Default route */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </div>
       </Router>

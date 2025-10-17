@@ -4,7 +4,9 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import User from '../models/User.js';
 import { blacklistToken } from '../middlewares/tokenBlacklist.js';
-import { redisClient } from '../config/redis.js';
+import dotenv from 'dotenv';
+
+dotenv.config({override: true, quiet: true});
 
 const router = express.Router();
 
@@ -54,8 +56,8 @@ router.post('/register', async (req, res) => {
     });
     res.status(201).json({
       message: 'User registered successfully',
-      token,
-      user: { id: user._id, username: user.username, email: user.email },
+      user: { id: user._id, username: user.username, email: user.email, profilePicture: user.profilePicture },
+
     });
   } catch (error) {
     console.error('Error during registration:', error);
@@ -96,8 +98,7 @@ router.post('/login', async (req, res) => {
 
     res.json({
       message: 'Login successful',
-      token,
-      user: { id: user._id, username: user.username, email: user.email },
+      user: { id: user._id, username: user.username, email: user.email, profilePicture: user.profilePicture },
     });
   } catch (error) {
     console.error('Error during login:', error);

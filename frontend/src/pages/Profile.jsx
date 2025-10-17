@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import Navbar from '../components/Navbar';
 
 const Profile = () => {
@@ -32,19 +33,27 @@ const Profile = () => {
         if (response.ok) {
           const data = await response.json();
           setFormData({ ...formData, profilePicture: `http://localhost:5000${data.profilePicture}` });
-          alert('Profile picture updated successfully!');
+          toast.success('Profile picture updated successfully!');
         } else {
           const error = await response.json();
-          alert(error.error || 'Failed to upload profile picture');
+          toast.error(error.error || 'Failed to upload profile picture');
         }
       } catch (error) {
-        alert('Error uploading profile picture');
+        toast.error('Error uploading profile picture');
       }
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Check if there are any changes
+    const hasChanges = formData.username !== user?.username || formData.email !== user?.email;
+    
+    if (!hasChanges) {
+      return; // Don't make API call or show toast if no changes
+    }
+    
     try {
       const response = await fetch('http://localhost:5000/api/users/profile', {
         method: 'PUT',
@@ -61,13 +70,13 @@ const Profile = () => {
       if (response.ok) {
         const data = await response.json();
         // Update user context if needed
-        alert('Profile updated successfully!');
+        toast.success('Profile updated successfully!');
       } else {
         const error = await response.json();
-        alert(error.error || 'Failed to update profile');
+        toast.error(error.error || 'Failed to update profile');
       }
     } catch (error) {
-      alert('Error updating profile');
+      toast.error('Error updating profile');
     }
   };
 

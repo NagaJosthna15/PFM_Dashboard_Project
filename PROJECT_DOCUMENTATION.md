@@ -177,7 +177,7 @@ A comprehensive Personal Finance Management (PFM) Dashboard built with React and
 MONGODB_URI=mongodb://localhost:27017/pfm-dashboard
 REDIS_URL=redis://localhost:6379
 JWT_SECRET=your-secret-key
-FRONTEND_URL=http://localhost:5173
+FRONTEND_URL=http://127.0.0.1:5173
 NODE_ENV=development
 PLAID_CLIENT_ID=your-plaid-client-id
 PLAID_SECRET_KEY=your-plaid-secret-key

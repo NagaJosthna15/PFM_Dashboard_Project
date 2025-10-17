@@ -12,10 +12,17 @@ const SpendingChart = ({ refresh }) => {
     setLoading(true);
     try {
       const response = await api.get('/api/dashboard/spending-by-category');
-      setData(response.data.data);
+      const allData = response.data.data.filter(item => item.value > 0);
+      const total = allData.reduce((sum, item) => sum + item.value, 0);
+      
+      // Separate data based on percentage threshold
+      const mainData = allData.filter(item => (item.value / total) >= 0.005); // >= 0.5%
+      const smallData = allData.filter(item => (item.value / total) < 0.005); // < 0.5%
+      
+      setData({ main: mainData, small: smallData });
     } catch (error) {
       console.error('Error fetching spending data:', error);
-      setData([]);
+      setData({ main: [], small: [] });
     } finally {
       setLoading(false);
     }
@@ -36,7 +43,7 @@ const SpendingChart = ({ refresh }) => {
     );
   }
 
-  if (data.length === 0) {
+  if (data.main?.length === 0 && data.small?.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow p-6 text-center">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Spending by Category</h3>
@@ -51,22 +58,38 @@ const SpendingChart = ({ refresh }) => {
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>
           <Pie
-            data={data}
+            data={data.main}
             cx="50%"
             cy="50%"
             labelLine={false}
-            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+            label={({ name, percent }) => {
+              const percentage = percent * 100;
+              return `${name} ${percentage.toFixed(0)}%`;
+            }}
             outerRadius={80}
             fill="#8884d8"
             dataKey="value"
           >
-            {data.map((entry, index) => (
+            {data.main?.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
           <Tooltip formatter={(value) => [`$${value.toFixed(2)}`, 'Amount']} />
         </PieChart>
       </ResponsiveContainer>
+      
+      {data.small?.length > 0 && (
+        <div className="mt-4 p-3 bg-gray-50 rounded">
+          <p className="text-xs text-gray-600 mb-2">Categories occupying &lt;0.5% are not shown in the pie chart:</p>
+          <div className="flex flex-wrap gap-2">
+            {data.small.map((item, index) => (
+              <span key={index} className="text-xs bg-gray-200 px-2 py-1 rounded">
+                {item.name}: ${item.value.toFixed(2)}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

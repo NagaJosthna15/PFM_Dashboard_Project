@@ -85,7 +85,7 @@ cp .env.example .env
 MONGODB_URI=mongodb://localhost:27017/pfm-dashboard
 REDIS_URL=redis://localhost:6379
 JWT_SECRET=your-secret-key
-FRONTEND_URL=http://localhost:5173
+FRONTEND_URL=http://127.0.0.1:5173
 NODE_ENV=development
 
 # Plaid Configuration (Week 2)
@@ -110,7 +110,7 @@ npm run dev
 ```
 
 The application will be available at:
-- Frontend: http://localhost:5173
+- Frontend: http://127.0.0.1:5173
 - Backend API: http://localhost:5000
 
 ## Week 2 - Bank Integration Setup

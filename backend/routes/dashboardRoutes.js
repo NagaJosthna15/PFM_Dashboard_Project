@@ -1,12 +1,13 @@
 import express from 'express';
 import { authenticateToken } from '../middlewares/auth.js';
 import PlaidItem from '../models/PlaidItem.js';
-import Budget from '../models/Budget.js';
+import dotenv from 'dotenv';
 import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
 import { categorizeTransaction } from '../utils/categorizer.js';
 
 const router = express.Router();
 
+dotenv.config({ override: true, quiet: true });
 const configuration = new Configuration({
   basePath: PlaidEnvironments[process.env.PLAID_ENV],
   baseOptions: {

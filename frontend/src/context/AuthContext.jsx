@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
 
@@ -6,57 +6,94 @@ const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };
 
-
-
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
 
-  // Axios interceptor to handle 401/403 responses
+  const handleLogout = useCallback(async () => {
+    if (!isAuthenticated) return;
+    try {
+      api.post('/api/auth/logout');
+    } catch (err) {
+      console.warn('Logout API call failed', err);
+    } finally {
+      setIsAuthenticated(false);
+      setUser(null);
+      toast.success('Logged out successfully');
+    }
+  }, [isAuthenticated]);
+
   useEffect(() => {
-    const interceptor = api.interceptors.response.use(
+    const responseInterceptor = api.interceptors.response.use(
       (res) => res,
       (err) => {
-        if (err.response?.status === 401 || err.response?.status === 403) {
+        const originalUrl = err.config?.url;
+        const status = err.response?.status;
+
+        if (
+          (status === 401 || status === 403) &&
+          !originalUrl?.includes('/api/users/profile') &&
+          isAuthenticated
+        ) {
           handleLogout();
         }
         return Promise.reject(err);
       }
     );
-    return () => api.interceptors.response.eject(interceptor);
-  }, []);
+    return () => api.interceptors.response.eject(responseInterceptor);
+  }, [handleLogout, isAuthenticated]);
 
-  // Check for existing token on mount
   useEffect(() => {
+   
+    let isCancelled = false;
+
     const checkAuth = async () => {
       try {
         const response = await api.get('/api/users/profile');
-        setUser(response.data.user);
-        setToken('authenticated'); // Set token flag if request succeeds
-      } catch {
+        if (isCancelled) return;
+
+        const userData = {
+          id: response.data.user?.id ?? response.data.user?._id,
+          username: response.data.user?.username,
+          email: response.data.user?.email,
+          profilePicture: response.data.user?.profilePicture
+        };
+        setUser(userData);
+        setIsAuthenticated(true);
+      } catch (err) {
+        if (isCancelled) return;
         setUser(null);
-        setToken(null);
+        setIsAuthenticated(false);
       } finally {
-        setInitialLoading(false);
+        if (!isCancelled) setInitialLoading(false);
       }
     };
+
     checkAuth();
-  }, []);
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []); 
 
   const login = async (credentials) => {
     setLoading(true);
     try {
       const response = await api.post('/api/auth/login', credentials);
-      setUser(response.data.user); 
-      setToken(response.data.token);
+      const userData = {
+        id: response.data.user?.id ?? response.data.user?._id,
+        username: response.data.user?.username,
+        email: response.data.user?.email,
+        profilePicture: response.data.user?.profilePicture
+      };
+      setUser(userData);
+      setIsAuthenticated(true);
       toast.success('Login successful!');
       return { success: true };
     } catch (error) {
@@ -72,8 +109,15 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await api.post('/api/auth/register', userData);
-      setUser(response.data.user); 
-      setToken(response.data.token);
+      const userDetails = {
+        id: response.data.user?.id ?? response.data.user?._id,
+        username: response.data.user?.username,
+        email: response.data.user?.email,
+        profilePicture: response.data.user?.profilePicture
+
+      };
+      setUser(userDetails);
+      setIsAuthenticated(true);
       toast.success('Registration successful!');
       return { success: true };
     } catch (error) {
@@ -85,21 +129,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await api.post('/api/auth/logout'); // blacklist & clear cookie
-    } catch (err) {
-      console.warn('Logout API failed', err);
-    } finally {
-      setToken(null);
-      setUser(null);
-      toast.success('Logged out successfully');
-    }
-  };
-
   const value = {
     user,
-    token,
+    isAuthenticated,
     loading,
     initialLoading,
     login,

@@ -1,5 +1,5 @@
 import { usePlaidLink } from 'react-plaid-link';
-import { useState } from 'react';
+import { useState, useEffect, memo } from 'react';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
 
@@ -42,10 +42,18 @@ const PlaidLink = ({ onSuccess }) => {
     },
   });
 
-  const handleConnect = () => {
+  useEffect(() => {
+    if (linkToken && ready) {
+      // Link is ready to use
+    }
+  }, [linkToken, ready]);
+
+  const handleConnect = async () => {
     if (!linkToken) {
-      createLinkToken();
-    } else if (ready) {
+      await createLinkToken();
+      return;
+    }
+    if (ready) {
       open();
     }
   };
@@ -68,4 +76,4 @@ const PlaidLink = ({ onSuccess }) => {
   );
 };
 
-export default PlaidLink;
+export default memo(PlaidLink);
