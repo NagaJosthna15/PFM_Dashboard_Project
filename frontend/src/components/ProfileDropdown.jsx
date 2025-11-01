@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
-
 const ProfileDropdown = () => {
   const { user, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
@@ -11,24 +10,20 @@ const ProfileDropdown = () => {
     profilePicture: user?.profilePicture ? `http://localhost:5000${user.profilePicture}` : ''
   });
   const fileInputRef = useRef(null);
-
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const formDataUpload = new FormData();
-      formDataUpload.append('profilePicture', file);
-      
+      formDataUpload.append('profilePicture', file);  
       try {
         const response = await fetch('http://localhost:5000/api/users/profile/upload', {
           method: 'POST',
           credentials: 'include',
           body: formDataUpload
         });
-        
         if (response.ok) {
           const data = await response.json();
           setFormData({ ...formData, profilePicture: `http://localhost:5000${data.profilePicture}` });
@@ -41,7 +36,6 @@ const ProfileDropdown = () => {
       }
     }
   };
-
   const handleSave = async () => {
     try {
       const response = await fetch('http://localhost:5000/api/users/profile', {
@@ -54,8 +48,7 @@ const ProfileDropdown = () => {
           username: formData.username,
           email: formData.email
         })
-      });
-      
+      });  
       if (response.ok) {
         setIsEditing(false);
       } else {
@@ -66,7 +59,6 @@ const ProfileDropdown = () => {
       alert('Error updating profile');
     }
   };
-
   return (
     <div className="relative">
       <div className='flex items-center space-x-2'>
@@ -84,7 +76,6 @@ const ProfileDropdown = () => {
         </div>
       </button>
       </div>
-
       {isOpen && (
         <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border z-50">
           <div className="p-4">
@@ -129,7 +120,6 @@ const ProfileDropdown = () => {
                 )}
               </div>
             </div>
-
             <input
               ref={fileInputRef}
               type="file"
@@ -137,7 +127,6 @@ const ProfileDropdown = () => {
               onChange={handleFileUpload}
               className="hidden"
             />
-
             <div className="flex flex-col space-y-2">
               {isEditing ? (
                 <div className="flex space-x-2">
@@ -180,7 +169,6 @@ const ProfileDropdown = () => {
           </div>
         </div>
       )}
-
       {isOpen && (
         <div
           className="fixed inset-0 z-40"
@@ -190,5 +178,4 @@ const ProfileDropdown = () => {
     </div>
   );
 };
-
 export default ProfileDropdown;

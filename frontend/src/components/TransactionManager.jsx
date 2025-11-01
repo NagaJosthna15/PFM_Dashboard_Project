@@ -1,10 +1,22 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
-
+import {
+  PieChart,
+  Pie,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  CartesianGrid,
+  Cell,
+  ResponsiveContainer,
+} from 'recharts';
 const categories = [
   'Food and Drink',
-  'Transportation', 
+  'Transportation',
   'Shopping',
   'Entertainment',
   'Bills & Utilities',
@@ -12,7 +24,7 @@ const categories = [
   'Income',
   'Other'
 ];
-
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#9C27B0', '#E91E63', '#4CAF50', '#F44336'];
 const TransactionManager = ({ refresh, onUpdate }) => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -22,9 +34,8 @@ const TransactionManager = ({ refresh, onUpdate }) => {
     name: '',
     amount: '',
     date: new Date().toISOString().split('T')[0],
-    category: 'Other'
+    category: 'Other',
   });
-
   const fetchTransactions = async () => {
     setLoading(true);
     try {
@@ -37,11 +48,9 @@ const TransactionManager = ({ refresh, onUpdate }) => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchTransactions();
   }, [refresh]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -52,31 +61,33 @@ const TransactionManager = ({ refresh, onUpdate }) => {
         await api.post('/api/user-transactions', formData);
         toast.success('Transaction added');
       }
-      
-      setFormData({ name: '', amount: '', date: new Date().toISOString().split('T')[0], category: 'Other' });
+      setFormData({
+        name: '',
+        amount: '',
+        date: new Date().toISOString().split('T')[0],
+        category: 'Other',
+      });
       setShowForm(false);
       setEditingId(null);
       fetchTransactions();
       onUpdate && onUpdate();
     } catch (error) {
-      toast.error('Failed to save transaction');
+      const message =error instanceof Error ? error.message:String(error)
+      toast.error('Failed to save transaction : '+message);
     }
   };
-
   const handleEdit = (transaction) => {
     setFormData({
       name: transaction.name,
       amount: Math.abs(transaction.amount).toString(),
       date: transaction.date.split('T')[0],
-      category: transaction.category[0] || 'Other'
+      category: transaction.category || 'Other',
     });
     setEditingId(transaction._id);
     setShowForm(true);
   };
-
   const handleDelete = async (id) => {
     if (!confirm('Delete this transaction?')) return;
-    
     try {
       await api.delete(`/api/user-transactions/${id}`);
       toast.success('Transaction deleted');
@@ -86,47 +97,61 @@ const TransactionManager = ({ refresh, onUpdate }) => {
       toast.error('Failed to delete transaction');
     }
   };
-
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(Math.abs(amount));
-  };
-
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Math.abs(amount));
+  // 📊 Budget summary
+  const totalIncome = transactions
+    .filter((t) => t.category === 'Income')
+    .reduce((sum, t) => sum + Number(t.amount), 0);
+  const totalExpense = transactions
+    .filter((t) => t.category !== 'Income')
+    .reduce((sum, t) => sum + Number(t.amount), 0);
+  const netBalance = totalIncome - totalExpense;
+  // 🧮 Frequency + Category totals
+  const categoryData = categories.map((cat) => {
+    const filtered = transactions.filter((t) => t.category === cat);
+    const total = filtered.reduce((sum, t) => sum + Number(t.amount), 0);
+    return {
+      category: cat,
+      frequency: filtered.length,
+      total,
+    };
+  }).filter((d) => d.frequency > 0);
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="space-y-3">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-4 bg-gray-200 rounded"></div>
-            ))}
-          </div>
+      <div className="bg-white rounded-lg shadow p-6 animate-pulse">
+        <div className="h-5 bg-gray-200 w-1/3 mb-3 rounded"></div>
+        <div className="space-y-2">
+          <div className="h-4 bg-gray-200 rounded"></div>
+          <div className="h-4 bg-gray-200 rounded"></div>
         </div>
       </div>
     );
   }
-
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium text-gray-900">Manage Transactions</h3>
+    <div className="bg-white rounded-lg shadow p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-gray-900">Manage Transactions</h3>
         <button
           onClick={() => {
             setShowForm(!showForm);
             setEditingId(null);
-            setFormData({ name: '', amount: '', date: new Date().toISOString().split('T')[0], category: 'Other' });
+            setFormData({
+              name: '',
+              amount: '',
+              date: new Date().toISOString().split('T')[0],
+              category: 'Other',
+            });
           }}
           className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded"
         >
           {showForm ? 'Cancel' : 'Add Transaction'}
         </button>
       </div>
-
+      {/* Transaction Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="mb-4 p-4 bg-gray-50 rounded">
+        <form onSubmit={handleSubmit} className="p-4 bg-gray-50 rounded">
           <div className="grid grid-cols-2 gap-4 mb-3">
             <input
               type="text"
@@ -160,8 +185,10 @@ const TransactionManager = ({ refresh, onUpdate }) => {
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
               className="border rounded px-3 py-2"
             >
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
               ))}
             </select>
           </div>
@@ -174,38 +201,102 @@ const TransactionManager = ({ refresh, onUpdate }) => {
         </form>
       )}
 
+      {/* Transaction List */}
       <div className="space-y-2 max-h-64 overflow-y-auto">
         {transactions.length === 0 ? (
           <p className="text-gray-500 text-center">No transactions found.</p>
         ) : (
-          transactions.slice(0, 10).map((transaction) => (
-            <div key={transaction._id} className="flex items-center justify-between p-3 bg-gray-50 rounded">
-              <div>
-                <span className="font-medium">{transaction.name}</span>
-                <span className="text-gray-500 ml-2">
-                  {formatCurrency(transaction.amount)} • {new Date(transaction.date).toLocaleDateString()}
-                </span>
+          transactions
+            .slice()
+            .reverse()
+            .slice(0, 10)
+            .map((t) => (
+              <div
+                key={t._id}
+                className="flex items-center justify-between p-3 bg-gray-50 rounded"
+              >
+                <div>
+                  <span className="font-medium">{t.name}</span>
+                  <span className="text-gray-500 ml-2">
+                    {formatCurrency(t.amount)} • {new Date(t.date).toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => handleEdit(t)}
+                    className="text-blue-600 hover:text-blue-800 text-sm"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(t._id)}
+                    className="text-red-600 hover:text-red-800 text-sm"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => handleEdit(transaction)}
-                  className="text-blue-600 hover:text-blue-800 text-sm"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(transaction._id)}
-                  className="text-red-600 hover:text-red-800 text-sm"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))
+            ))
         )}
       </div>
+      {/* Budget Statement */}
+      {transactions.length > 0 && (
+        <div className="bg-gray-50 p-4 rounded">
+          <h4 className="font-semibold text-md mb-2">Budget Statement</h4>
+          <p className="text-green-600">Total Income: {formatCurrency(totalIncome)}</p>
+          <p className="text-red-600">Total Expenses: {formatCurrency(totalExpense)}</p>
+          <p
+            className={`font-semibold mt-2 ${
+              netBalance >= 0 ? 'text-green-700' : 'text-red-700'
+            }`}
+          >
+            Net Balance: {formatCurrency(netBalance)}
+          </p>
+        </div>
+      )}
+      {/* Charts */}
+      {categoryData.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Frequency Bar Chart */}
+          <div className="bg-gray-50 p-4 rounded shadow">
+            <h4 className="text-sm font-semibold mb-2">Transaction Frequency</h4>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={categoryData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="category" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="frequency" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          {/* Pie Chart */}
+          <div className="bg-gray-50 p-4 rounded shadow">
+            <h4 className="text-sm font-semibold mb-2">Category Spending</h4>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={categoryData}
+                  dataKey="total"
+                  nameKey="category"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label
+                >
+                  {categoryData.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
-
 export default TransactionManager;

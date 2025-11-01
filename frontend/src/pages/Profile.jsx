@@ -3,7 +3,6 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import Navbar from '../components/Navbar';
-
 const Profile = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -12,24 +11,20 @@ const Profile = () => {
     email: user?.email || '',
     profilePicture: user?.profilePicture ? `http://localhost:5000${user.profilePicture}` : ''
   });
-
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const formDataUpload = new FormData();
       formDataUpload.append('profilePicture', file);
-      
       try {
         const response = await fetch('http://localhost:5000/api/users/profile/upload', {
           method: 'POST',
           credentials: 'include',
           body: formDataUpload
         });
-        
         if (response.ok) {
           const data = await response.json();
           setFormData({ ...formData, profilePicture: `http://localhost:5000${data.profilePicture}` });
@@ -43,17 +38,13 @@ const Profile = () => {
       }
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     // Check if there are any changes
     const hasChanges = formData.username !== user?.username || formData.email !== user?.email;
-    
     if (!hasChanges) {
       return; // Don't make API call or show toast if no changes
     }
-    
     try {
       const response = await fetch('http://localhost:5000/api/users/profile', {
         method: 'PUT',
@@ -65,8 +56,7 @@ const Profile = () => {
           username: formData.username,
           email: formData.email
         })
-      });
-      
+      }); 
       if (response.ok) {
         const data = await response.json();
         // Update user context if needed

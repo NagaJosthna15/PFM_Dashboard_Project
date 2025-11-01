@@ -2,11 +2,9 @@ import { usePlaidLink } from 'react-plaid-link';
 import { useState, useEffect, memo } from 'react';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
-
 const PlaidLink = ({ onSuccess }) => {
   const [linkToken, setLinkToken] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const createLinkToken = async () => {
     setLoading(true);
     try {
@@ -19,15 +17,13 @@ const PlaidLink = ({ onSuccess }) => {
       setLoading(false);
     }
   };
-
   const { open, ready } = usePlaidLink({
     token: linkToken,
     onSuccess: async (publicToken, metadata) => {
       try {
         const response = await api.post('/api/exchange_public_token', {
           publicToken
-        });
-        
+        });    
         toast.success('Bank account connected successfully!');
         onSuccess && onSuccess(response.data);
       } catch (error) {
@@ -41,13 +37,11 @@ const PlaidLink = ({ onSuccess }) => {
       }
     },
   });
-
   useEffect(() => {
     if (linkToken && ready) {
       // Link is ready to use
     }
   }, [linkToken, ready]);
-
   const handleConnect = async () => {
     if (!linkToken) {
       await createLinkToken();
@@ -57,7 +51,6 @@ const PlaidLink = ({ onSuccess }) => {
       open();
     }
   };
-
   return (
     <button
       onClick={handleConnect}
@@ -74,6 +67,5 @@ const PlaidLink = ({ onSuccess }) => {
       )}
     </button>
   );
-};
-
+}
 export default memo(PlaidLink);

@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
-
 const TransactionsList = ({ refresh }) => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
-
   const fetchTransactions = async () => {
     setLoading(true);
     try {
@@ -20,18 +18,15 @@ const TransactionsList = ({ refresh }) => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchTransactions();
   }, [refresh]);
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD'
     }).format(Math.abs(amount));
   };
-
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
@@ -46,7 +41,6 @@ const TransactionsList = ({ refresh }) => {
       </div>
     );
   }
-
   if (transactions.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow p-6 text-center">
@@ -54,7 +48,6 @@ const TransactionsList = ({ refresh }) => {
       </div>
     );
   }
-
   return (
     <div className="bg-white rounded-lg shadow">
       <div className="px-6 py-4 border-b border-gray-200">
@@ -89,5 +82,4 @@ const TransactionsList = ({ refresh }) => {
     </div>
   );
 };
-
 export default TransactionsList;

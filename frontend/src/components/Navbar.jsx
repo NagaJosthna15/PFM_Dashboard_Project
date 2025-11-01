@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import ProfileDropdown from './ProfileDropdown';
-
 const Navbar = () => {
   return (
     <nav className="bg-white shadow">
@@ -19,5 +18,4 @@ const Navbar = () => {
     </nav>
   );
 };
-
 export default Navbar;

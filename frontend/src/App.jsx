@@ -5,11 +5,9 @@ import Register from './components/Register';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import { AuthProvider, useAuth } from './context/AuthContext';
-
 // ✅ Only render children if user is authenticated
 function ProtectedRoute({ children }) {
   const { isAuthenticated, initialLoading } = useAuth();
-  
   if (initialLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -17,14 +15,11 @@ function ProtectedRoute({ children }) {
       </div>
     );
   }
-  
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 }
-
 // ✅ Redirect logged-in users away from login/register
 function PublicRoute({ children }) {
-  const { isAuthenticated, initialLoading } = useAuth();
-  
+  const { isAuthenticated, initialLoading } = useAuth(); 
   if (initialLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -32,10 +27,8 @@ function PublicRoute({ children }) {
       </div>
     );
   }
-  
   return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
 }
-
 function App() {
   return (
     <AuthProvider>
@@ -60,7 +53,6 @@ function App() {
                 </PublicRoute>
               }
             />
-
             {/* Protected routes */}
             <Route
               path="/dashboard"
@@ -78,7 +70,6 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
             {/* Default route */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
           </Routes>
@@ -87,5 +78,4 @@ function App() {
     </AuthProvider>
   );
 }
-
 export default App;

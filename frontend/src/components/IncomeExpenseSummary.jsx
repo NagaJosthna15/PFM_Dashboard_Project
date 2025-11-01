@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
-
 const IncomeExpenseSummary = ({ refresh }) => {
   const [data, setData] = useState({ income: 0, expense: 0, net: 0 });
   const [loading, setLoading] = useState(false);
-
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -17,18 +15,15 @@ const IncomeExpenseSummary = ({ refresh }) => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchData();
   }, [refresh]);
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD'
     }).format(amount);
   };
-
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
@@ -43,7 +38,6 @@ const IncomeExpenseSummary = ({ refresh }) => {
       </div>
     );
   }
-
   return (
     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 border border-blue-100">
       <h3 className="text-xl font-semibold text-gray-900 mb-6 text-center">This Month's Summary</h3>
@@ -83,5 +77,4 @@ const IncomeExpenseSummary = ({ refresh }) => {
     </div>
   );
 };
-
 export default IncomeExpenseSummary;
