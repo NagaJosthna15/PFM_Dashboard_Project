@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import api from '../utils/api';
-
 const MonthlyChart = ({ refresh }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -18,11 +16,9 @@ const MonthlyChart = ({ refresh }) => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchData();
   }, [refresh]);
-
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
@@ -33,7 +29,6 @@ const MonthlyChart = ({ refresh }) => {
       </div>
     );
   }
-
   if (data.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow p-6 text-center">
@@ -42,7 +37,6 @@ const MonthlyChart = ({ refresh }) => {
       </div>
     );
   }
-
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h3 className="text-lg font-medium text-gray-900 mb-4">Monthly Income vs Expenses</h3>
@@ -60,5 +54,4 @@ const MonthlyChart = ({ refresh }) => {
     </div>
   );
 };
-
 export default MonthlyChart;

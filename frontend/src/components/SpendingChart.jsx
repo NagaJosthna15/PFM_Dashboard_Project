@@ -1,24 +1,19 @@
 import { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import api from '../utils/api';
-
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
-
 const SpendingChart = ({ refresh }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-
   const fetchData = async () => {
     setLoading(true);
     try {
       const response = await api.get('/api/dashboard/spending-by-category');
       const allData = response.data.data.filter(item => item.value > 0);
       const total = allData.reduce((sum, item) => sum + item.value, 0);
-      
       // Separate data based on percentage threshold
       const mainData = allData.filter(item => (item.value / total) >= 0.005); // >= 0.5%
       const smallData = allData.filter(item => (item.value / total) < 0.005); // < 0.5%
-      
       setData({ main: mainData, small: smallData });
     } catch (error) {
       console.error('Error fetching spending data:', error);
@@ -27,11 +22,9 @@ const SpendingChart = ({ refresh }) => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchData();
   }, [refresh]);
-
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
@@ -42,7 +35,6 @@ const SpendingChart = ({ refresh }) => {
       </div>
     );
   }
-
   if (data.main?.length === 0 && data.small?.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow p-6 text-center">
@@ -51,7 +43,6 @@ const SpendingChart = ({ refresh }) => {
       </div>
     );
   }
-
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h3 className="text-lg font-medium text-gray-900 mb-4">Spending by Category</h3>
@@ -76,8 +67,7 @@ const SpendingChart = ({ refresh }) => {
           </Pie>
           <Tooltip formatter={(value) => [`$${value.toFixed(2)}`, 'Amount']} />
         </PieChart>
-      </ResponsiveContainer>
-      
+      </ResponsiveContainer>   
       {data.small?.length > 0 && (
         <div className="mt-4 p-3 bg-gray-50 rounded">
           <p className="text-xs text-gray-600 mb-2">Categories occupying &lt;0.5% are not shown in the pie chart:</p>
@@ -93,5 +83,4 @@ const SpendingChart = ({ refresh }) => {
     </div>
   );
 };
-
 export default SpendingChart;

@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
-
 const AccountsList = ({ refresh }) => {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(false);
-
   const fetchAccounts = async () => {
     setLoading(true);
     try {
@@ -20,18 +18,15 @@ const AccountsList = ({ refresh }) => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchAccounts();
   }, [refresh]);
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD'
     }).format(amount);
   };
-
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
@@ -45,7 +40,6 @@ const AccountsList = ({ refresh }) => {
       </div>
     );
   }
-
   if (accounts.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow p-6 text-center">
@@ -53,7 +47,6 @@ const AccountsList = ({ refresh }) => {
       </div>
     );
   }
-
   return (
     <div className="bg-white rounded-lg shadow">
       <div className="px-6 py-4 border-b border-gray-200">
@@ -84,5 +77,4 @@ const AccountsList = ({ refresh }) => {
     </div>
   );
 };
-
 export default AccountsList;

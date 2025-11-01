@@ -8,18 +8,14 @@ import MonthlyChart from '../components/MonthlyChart';
 import BudgetManager from '../components/BudgetManager';
 import IncomeExpenseSummary from '../components/IncomeExpenseSummary';
 import TransactionManager from '../components/TransactionManager';
-
 const Dashboard = () => {
   const [refreshKey, setRefreshKey] = useState(0);
-
   const handlePlaidSuccess = () => {
     setRefreshKey(prev => prev + 1);
   };
-
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      
+      <Navbar />  
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           {/* Header */}
@@ -38,12 +34,10 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-
           {/* Summary Cards */}
           <div className="mb-8">
             <IncomeExpenseSummary refresh={refreshKey} />
           </div>
-
           {/* Charts Section */}
           <div className="mb-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Analytics</h2>
@@ -52,7 +46,6 @@ const Dashboard = () => {
               <MonthlyChart refresh={refreshKey} />
             </div>
           </div>
-
           {/* Accounts and Transactions Section */}
           <div className="mb-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Accounts & Transactions</h2>
@@ -61,7 +54,6 @@ const Dashboard = () => {
               <TransactionsList refresh={refreshKey} />
             </div>
           </div>
-
           {/* Management Section */}
           <div className="mb-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Manage</h2>
@@ -75,5 +67,4 @@ const Dashboard = () => {
     </div>
   );
 };
-
 export default Dashboard;
